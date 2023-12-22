@@ -56,7 +56,7 @@ module ball_next_state(
 	input [9:0] acc_curr_x, //acceleration
 	input [9:0] acc_curr_y,
 	output [9:0] acc_next_x,
-	output [9:0] acc_next_y,
+	output [9:0] acc_next_y
 );
 	//combinational
 	//todo
@@ -114,10 +114,11 @@ module vga_displayer(
 	input clk, 
 	input reset, 
 	input btn_r, 
-	output hsync, vsync;
+	output hsync,
+	output vsync,
 	output [3:0] red, 
 	output [3:0] green, 
-	output [3:0] blue;
+	output [3:0] blue
 );
 	//todo
 endmodule
