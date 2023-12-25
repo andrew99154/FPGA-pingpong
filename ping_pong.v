@@ -17,9 +17,10 @@ module ping_pong(
 	output vsync
 );
 	wire [1:0] game_state;
-	parameter serve = 2'd0;
-	parameter playing = 2'd1;
-	parameter done = 2'd2;
+	parameter p1_serve = 2'd0;
+	parameter p2_serve = 2'd1;
+	parameter playing = 2'd2;
+	parameter done = 2'd3;
 
 	//todo
 
