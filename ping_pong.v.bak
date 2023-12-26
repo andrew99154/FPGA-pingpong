@@ -29,97 +29,16 @@ module board_controller(
 	input clk,
 	input reset,
 	input [1:0] game_state,
-	input p1u,
-	input p1d,
-	input p2u,
-	input p2d,
-	output reg [9:0] p1_y, //position of the board
-	output reg [9:0] p2_y //position of the board
+	input p1l,
+	input p1r,
+	input p2l,
+	input p2r,
+	output [9:0] p1_x, //position of the board
+	output [9:0] p2_x //position of the board
 );
 
 	//todo
 	//sequential
-	
-	//record next pos of player board
-	reg [9:0]next_p1_y;
-	reg [9:0]next_p2_y;
-	
-	//link move counter of board
-	//counting next pos of board first
-	//next, when clk is coming update pos
-	
-	//only will moving once a clk
-	//since we the based value is from this module
-	//then if clk do not change based value, the pos of both player will only change +-10
-	module player_moveBoard p1_move(
-							.pu(p1u),
-							.pd(p1d),
-							.last(p1_y),	//lsat position of the board
-							.py(next_p1_y), //position of the board
-						);
-	module player_moveBoard p2_move(
-		.pu(p2u),
-		.pd(p2d),
-		.last(p2_y),	//lsat position of the board
-		.py(next_p2_y), //position of the board
-	);
-	always@(posedge clk or negedge reset) begin
-	
-		if(!reset) begin
-			//reset position of two board back to init position
-			p1_y <= 10'd220;
-			p2_y <= 10'd220;
-		end else begin
-			
-			//decide output based on game_state
-			case(game_state)
-				2'd0: begin
-						//player 1 can move his board
-						p1_y <= next_p1_y;
-					end
-				2'd1: begin
-						//player 2 can move his board
-						p2_y <= next_p2_y;
-					end
-				2'd2: begin
-						//both them can move their board
-						p1_y <= next_p1_y;
-						p2_y <= next_p2_y;
-					end
-				2'd3: begin
-						//both them can not move their board
-						//do nothing
-					end
-			endcase
-			
-		end
-	
-	end
-
-endmodule
-
-//moving of player
-module player_moveBoard(
-	input pu,
-	input pd,
-	input [9:0]last,	//lsat position of the board
-	output reg [9:0] py, //position of the board
-);
-	py <= last;	//default setting now pos eauals previous pos
-
-	always(negedge pu or negedge pd) begin
-		if(!pu) begin
-			py <= last - 10'd10;
-		
-			if(py < 10'd140) py <= 10'd140;
-		end else if(!pd) begin
-			py <= last + 10'd10;
-		
-			if(py > 10'd340) py <= 10'd340;
-		end else begin
-			//will not happen
-		end
-	end
 
 endmodule
 
