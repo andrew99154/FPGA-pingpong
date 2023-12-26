@@ -78,11 +78,11 @@ module board_controller(
 			case(game_state)
 				2'd0: begin
 						//player 1 can move his board
-						p1_y <= next_p1_y;
+						//nothing
 					end
 				2'd1: begin
 						//player 2 can move his board
-						p2_y <= next_p2_y;
+						//nothing
 					end
 				2'd2: begin
 						//both them can move their board
@@ -113,10 +113,12 @@ module player_moveBoard(
 );
 
 	parameter speed = 10'd10;
-	py <= last;	//default setting now pos eauals previous pos
 
-	always(posedge pu or posedge pd) begin
-		if(!pu) begin
+	always(pu or pd) begin
+		if (!pu and !pd) begin
+			//equals no move
+			py <= last;
+		end else if(!pu) begin
 			py <= last - speed;
 		
 			if(py < 10'd140) py <= 10'd140;
@@ -125,7 +127,8 @@ module player_moveBoard(
 		
 			if(py > 10'd340) py <= 10'd340;
 		end else begin
-			//will not happen
+			//no move
+			py <= last;
 		end
 	end
 
