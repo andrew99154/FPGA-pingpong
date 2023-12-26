@@ -79,10 +79,12 @@ module board_controller(
 				2'd0: begin
 						//player 1 can move his board
 						//nothing
+						p2_y <= next_p2_y;
 					end
 				2'd1: begin
 						//player 2 can move his board
 						//nothing
+						p1_y <= next_p1_y;
 					end
 				2'd2: begin
 						//both them can move their board
@@ -122,10 +124,12 @@ module player_moveBoard(
 			py <= last - speed;
 		
 			if(py < 10'd140) py <= 10'd140;
+			else //nothing
 		end else if(!pd) begin
 			py <= last + speed;
 		
 			if(py > 10'd340) py <= 10'd340;
+			else //nothing;
 		end else begin
 			//no move
 			py <= last;
@@ -229,13 +233,9 @@ module timer(
 		case(game_state)
 			2'd0: begin
 					//player 1 serve	
-					count <= 0;
-					time_cnt <= 0;
 				end
 			2'd1: begin
 					//player 2 serve
-					count <= 0;
-					time_cnt <= 0;
 				end
 			2'd2: begin
 					//playing
