@@ -40,6 +40,9 @@ module board_controller(
 	//todo
 	//sequential
 	
+	//const value
+	parameter center = 10'd220; //board center
+
 	//record next pos of player board
 	reg [9:0]next_p1_y;
 	reg [9:0]next_p2_y;
@@ -51,13 +54,13 @@ module board_controller(
 	//only will moving once a clk
 	//since we the based value is from this module
 	//then if clk do not change based value, the pos of both player will only change +-10
-	module player_moveBoard p1_move(
+	player_moveBoard p1_move(
 							.pu(p1u),
 							.pd(p1d),
 							.last(p1_y),	//lsat position of the board
 							.py(next_p1_y), //position of the board
 						);
-	module player_moveBoard p2_move(
+	player_moveBoard p2_move(
 		.pu(p2u),
 		.pd(p2d),
 		.last(p2_y),	//lsat position of the board
@@ -67,8 +70,8 @@ module board_controller(
 	
 		if(!reset) begin
 			//reset position of two board back to init position
-			p1_y <= 10'd220;
-			p2_y <= 10'd220;
+			p1_y <= center;
+			p2_y <= center;
 		end else begin
 			
 			//decide output based on game_state
@@ -88,7 +91,10 @@ module board_controller(
 					end
 				2'd3: begin
 						//both them can not move their board
-						//do nothing
+						//game is done, everyone back center
+
+						p1_y <= center;
+						p2_y <= center;
 					end
 			endcase
 			
@@ -105,15 +111,17 @@ module player_moveBoard(
 	input [9:0]last,	//lsat position of the board
 	output reg [9:0] py, //position of the board
 );
+
+	parameter speed = 10'd10;
 	py <= last;	//default setting now pos eauals previous pos
 
-	always(negedge pu or negedge pd) begin
+	always(posedge pu or posedge pd) begin
 		if(!pu) begin
-			py <= last - 10'd10;
+			py <= last - speed;
 		
 			if(py < 10'd140) py <= 10'd140;
 		end else if(!pd) begin
-			py <= last + 10'd10;
+			py <= last + speed;
 		
 			if(py > 10'd340) py <= 10'd340;
 		end else begin
