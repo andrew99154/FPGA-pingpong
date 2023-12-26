@@ -114,7 +114,7 @@ module player_moveBoard(
 
 	parameter speed = 10'd10;
 
-	always(pu or pd) begin
+	always@(pu or pd) begin
 		if (!pu and !pd) begin
 			//equals no move
 			py <= last;
@@ -218,18 +218,84 @@ endmodule
 module timer(
 	input clk,
 	input game_state,
-	output [5:0] time_cnt
+	output reg [5:0] time_cnt
 );
 	//count down timer
 	//todo
+	
+	reg [32:0] count;	//counter, every 250000000 count => plus 1 second
+
+	always@(posedge clk) begin
+		case(game_state)
+			2'd0: begin
+					//player 1 serve	
+					count <= 0;
+					time_cnt <= 0;
+				end
+			2'd1: begin
+					//player 2 serve
+					count <= 0;
+					time_cnt <= 0;
+				end
+			2'd2: begin
+					//playing
+					count <= count + 1;
+				end
+			2'd3: begin
+					//done
+					count <= 0;
+					time_cnt <= 0;
+				end
+		endcase
+		
+		if(count >= 250000000) begin
+			count <= 0;
+			time_cnt <= time_cnt + 1;		
+		end
+	end
+
 endmodule
 
 module time_displayer(
-	input time_cnt,
+	input [5:0]time_cnt,
 	output [6:0] time_ten,
 	output [6:0] time_one
 );
 	//todo
+	
+	reg [3:0]ten, one;
+	always@(time_cnt) begin
+		//count now digit at ten and one
+		one <= time_cnt % 5'd10;
+		ten <= (time_cnt / 5'd10) % 5'd10;
+
+		case(one)
+			4'd0: time_one <= 7'd1000000;
+			4'd1: time_one <= 7'd1111001;
+			4'd2: time_one <= 7'd0010100;
+			4'd3: time_one <= 7'd0011000;
+			4'd4: time_one <= 7'd0011001;
+			4'd5: time_one <= 7'd0001010;		
+			4'd6: time_one <= 7'd0000010;
+			4'd7: time_one <= 7'd1111000;
+			4'd8: time_one <= 7'd0000000;
+			4'd9: time_one <= 7'd0010000;
+		endcase
+	
+		case(ten)
+			4'd0: time_ten <= 7'd1000000;
+			4'd1: time_ten <= 7'd1111001;
+			4'd2: time_ten <= 7'd0010100;
+			4'd3: time_ten <= 7'd0011000;
+			4'd4: time_ten <= 7'd0011001;
+			4'd5: time_ten <= 7'd0001010;		
+			4'd6: time_ten <= 7'd0000010;
+			4'd7: time_ten <= 7'd1111000;
+			4'd8: time_ten <= 7'd0000000;
+			4'd9: time_ten <= 7'd0010000;
+		endcase
+	end
+
 endmodule
 
 module matrix_displayer(
