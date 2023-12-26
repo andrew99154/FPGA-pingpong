@@ -14,13 +14,20 @@ module process_next_state(reset,p1l,p1r,p2l,p2r,ball_x,ball_y,time_cnt,game_stat
 	if(game_state == 2'd0) //p1_serve
 	begin
 	end
-	else if(game_state == 2'd1) //p2_serve
+	else if(game_state == 2'd1)//p2_serve
 	begin
 	end
-	else if(game_state == 2'd2) //playing
-	begin
-	end
-	else //end
+	else if(game_state == 2'd2)//playing
+		begin
+		if(ball_x>490)//from playing to p2_serve
+			game_next_state = 2'd1;  
+		else if(ball_x<150) //from playing to p1_reserve
+			game_next_state=2'd0;
+		else if()
+		else //keep playing
+			game_next_state=2'd2;
+		end
+	else//end
 	begin
 	end
 	
