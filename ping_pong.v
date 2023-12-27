@@ -320,18 +320,80 @@ endmodule
 module timer(
 	input clk,
 	input game_state,
-	output [5:0] time_cnt
+	output reg [5:0] time_cnt
 );
 	//count down timer
 	//todo
+	
+	reg [32:0] count;	//counter, every 250000000 count => plus 1 second
+
+	always@(posedge clk) begin
+		case(game_state)
+			2'd0: begin
+					//player 1 serve	
+				end
+			2'd1: begin
+					//player 2 serve
+				end
+			2'd2: begin
+					//playing
+					count <= count + 1;
+				end
+			2'd3: begin
+					//done
+					count <= 0;
+					time_cnt <= 0;
+				end
+		endcase
+		
+		if(count >= 250000000) begin
+			count <= 0;
+			time_cnt <= time_cnt + 1;		
+		end
+	end
+
 endmodule
 
 module time_displayer(
-	input time_cnt,
+	input [5:0]time_cnt,
 	output [6:0] time_ten,
 	output [6:0] time_one
 );
 	//todo
+	
+	reg [3:0]ten, one;
+	always@(time_cnt) begin
+		//count now digit at ten and one
+		one <= time_cnt % 5'd10;
+		ten <= (time_cnt / 5'd10) % 5'd10;
+
+		case(one)
+			4'd0: time_one <= 7'b1000000;
+			4'd1: time_one <= 7'b1111001;
+			4'd2: time_one <= 7'b0010100;
+			4'd3: time_one <= 7'b0011000;
+			4'd4: time_one <= 7'b0011001;
+			4'd5: time_one <= 7'b0001010;		
+			4'd6: time_one <= 7'b0000010;
+			4'd7: time_one <= 7'b1111000;
+			4'd8: time_one <= 7'b0000000;
+			4'd9: time_one <= 7'b0010000;
+		endcase
+	
+		case(ten)
+			4'd0: time_ten <= 7'b1000000;
+			4'd1: time_ten <= 7'b1111001;
+			4'd2: time_ten <= 7'b0010100;
+			4'd3: time_ten <= 7'b0011000;
+			4'd4: time_ten <= 7'b0011001;
+			4'd5: time_ten <= 7'b0001010;		
+			4'd6: time_ten <= 7'b0000010;
+			4'd7: time_ten <= 7'b1111000;
+			4'd8: time_ten <= 7'b0000000;
+			4'd9: time_ten <= 7'b0010000;
+		endcase
+	end
+
 endmodule
 
 module matrix_displayer(
@@ -344,5 +406,298 @@ module matrix_displayer(
 	output [7:0] dot_matrix_right_col
 );
 	//todo
-
-endmodule	
+	//letf represent player 1's score
+	//right represent player 2's score
+	parameter done = 2'd3;
+	
+	reg [2:0]row_count;
+	row_count <= 0;	//init
+	
+	always@(posedge clk) begin
+		if(game_state == done) begin
+			//show who's the winner
+			if(p1_score > p2_score) begin
+				//P1
+				//left matrix
+				case(row_count)
+					3'd0: dot_matrix_left_col <= 8'b00000000;
+					3'd1: dot_matrix_left_col <= 8'b01111100;
+					3'd2: dot_matrix_left_col <= 8'b01100100;
+					3'd3: dot_matrix_left_col <= 8'b01100100;
+					3'd4: dot_matrix_left_col <= 8'b01111100;
+					3'd5: dot_matrix_left_col <= 8'b01100000;
+					3'd6: dot_matrix_left_col <= 8'b01100000;
+					3'd7: dot_matrix_left_col <= 8'b01100000;
+				endcase
+				
+				//right matrix
+				case(row_count)
+					3'd0: dot_matrix_right_col <= 8'b00000000;
+					3'd1: dot_matrix_right_col <= 8'b00011000;
+					3'd2: dot_matrix_right_col <= 8'b00111000;
+					3'd3: dot_matrix_right_col <= 8'b00011000;
+					3'd4: dot_matrix_right_col <= 8'b00011000;
+					3'd5: dot_matrix_right_col <= 8'b00011000;
+					3'd6: dot_matrix_right_col <= 8'b01111100;
+					3'd7: dot_matrix_right_col <= 8'b00000000;
+				endcase
+			end else begin
+				//P2
+				//left matrix
+				case(row_count)
+					3'd0: dot_matrix_left_col <= 8'b00000000;
+					3'd1: dot_matrix_left_col <= 8'b01111100;
+					3'd2: dot_matrix_left_col <= 8'b01100100;
+					3'd3: dot_matrix_left_col <= 8'b01100100;
+					3'd4: dot_matrix_left_col <= 8'b01111100;
+					3'd5: dot_matrix_left_col <= 8'b01100000;
+					3'd6: dot_matrix_left_col <= 8'b01100000;
+					3'd7: dot_matrix_left_col <= 8'b01100000;
+				endcase
+				
+				//right matrix
+				case(row_count)
+					3'd0: dot_matrix_right_col <= 8'b00000000;
+					3'd1: dot_matrix_right_col <= 8'b00111000;
+					3'd2: dot_matrix_right_col <= 8'b01101100;
+					3'd3: dot_matrix_right_col <= 8'b00001100;
+					3'd4: dot_matrix_right_col <= 8'b00011000;
+					3'd5: dot_matrix_right_col <= 8'b00110000;
+					3'd6: dot_matrix_right_col <= 8'b01111110;
+					3'd7: dot_matrix_right_col <= 8'b00000000;
+				endcase
+			end
+		end else begin
+			//show both player's score
+			case(p1_score)
+				3'd0: begin
+					//left matrix
+					case(row_count)
+						3'd0: dot_matrix_left_col <= 8'b00000000;
+						3'd1: dot_matrix_left_col <= 8'b00111100;
+						3'd2: dot_matrix_left_col <= 8'b01100110;
+						3'd3: dot_matrix_left_col <= 8'b11000011;
+						3'd4: dot_matrix_left_col <= 8'b11000011;
+						3'd5: dot_matrix_left_col <= 8'b01100110;
+						3'd6: dot_matrix_left_col <= 8'b00111100;
+						3'd7: dot_matrix_left_col <= 8'b00000000;
+					endcase
+				end
+				3'd1: begin
+					//left matrix
+					case(row_count)
+						3'd0: dot_matrix_left_col <= 8'b00000000;
+						3'd1: dot_matrix_left_col <= 8'b00011000;
+						3'd2: dot_matrix_left_col <= 8'b00111000;
+						3'd3: dot_matrix_left_col <= 8'b00011000;
+						3'd4: dot_matrix_left_col <= 8'b00011000;
+						3'd5: dot_matrix_left_col <= 8'b00011000;
+						3'd6: dot_matrix_left_col <= 8'b01111100;
+						3'd7: dot_matrix_left_col <= 8'b00000000;
+					endcase
+				end
+				3'd2: begin
+					//left matrix
+					case(row_count)
+						3'd0: dot_matrix_left_col <= 8'b00000000;
+						3'd1: dot_matrix_left_col <= 8'b00111100;
+						3'd2: dot_matrix_left_col <= 8'b01100110;
+						3'd3: dot_matrix_left_col <= 8'b00001100;
+						3'd4: dot_matrix_left_col <= 8'b00011000;
+						3'd5: dot_matrix_left_col <= 8'b00110000;
+						3'd6: dot_matrix_left_col <= 8'b01111110;
+						3'd7: dot_matrix_left_col <= 8'b00000000;
+					endcase
+				end
+				3'd3: begin
+					//left matrix
+					case(row_count)
+						3'd0: dot_matrix_left_col <= 8'b00000000;
+						3'd1: dot_matrix_left_col <= 8'b00111100;
+						3'd2: dot_matrix_left_col <= 8'b00000110;
+						3'd3: dot_matrix_left_col <= 8'b00000110;
+						3'd4: dot_matrix_left_col <= 8'b00111100;
+						3'd5: dot_matrix_left_col <= 8'b00000110;
+						3'd6: dot_matrix_left_col <= 8'b00000110;
+						3'd7: dot_matrix_left_col <= 8'b00111100;
+					endcase
+				end
+				3'd4: begin
+						//left matrix
+					case(row_count)
+						3'd0: dot_matrix_left_col <= 8'b00000000;
+						3'd1: dot_matrix_left_col <= 8'b00001110;
+						3'd2: dot_matrix_left_col <= 8'b00010110;
+						3'd3: dot_matrix_left_col <= 8'b00100110;
+						3'd4: dot_matrix_left_col <= 8'b01000110;
+						3'd5: dot_matrix_left_col <= 8'b11111110;
+						3'd6: dot_matrix_left_col <= 8'b00000110;
+						3'd7: dot_matrix_left_col <= 8'b00000110;
+					endcase
+				end
+				3'd5: begin
+					//left matrix
+					case(row_count)
+						3'd0: dot_matrix_left_col <= 8'b00000000;
+						3'd1: dot_matrix_left_col <= 8'b00111110;
+						3'd2: dot_matrix_left_col <= 8'b00100000;
+						3'd3: dot_matrix_left_col <= 8'b00100000;
+						3'd4: dot_matrix_left_col <= 8'b00111110;
+						3'd5: dot_matrix_left_col <= 8'b00000010;
+						3'd6: dot_matrix_left_col <= 8'b00000010;
+						3'd7: dot_matrix_left_col <= 8'b00111110;
+					endcase
+				end
+				3'd6: begin
+					//left matrix
+					case(row_count)
+						3'd0: dot_matrix_left_col <= 8'b00000000;
+						3'd1: dot_matrix_left_col <= 8'b01111100;
+						3'd2: dot_matrix_left_col <= 8'b01100000;
+						3'd3: dot_matrix_left_col <= 8'b01100000;
+						3'd4: dot_matrix_left_col <= 8'b01111110;
+						3'd5: dot_matrix_left_col <= 8'b01100010;
+						3'd6: dot_matrix_left_col <= 8'b01100010;
+						3'd7: dot_matrix_left_col <= 8'b01111110;
+					endcase
+				end
+				3'd7: begin
+					//left matrix
+					case(row_count)
+						3'd0: dot_matrix_left_col <= 8'b00000000;
+						3'd1: dot_matrix_left_col <= 8'b01111110;
+						3'd2: dot_matrix_left_col <= 8'b00000110;
+						3'd3: dot_matrix_left_col <= 8'b00001100;
+						3'd4: dot_matrix_left_col <= 8'b00011000;
+						3'd5: dot_matrix_left_col <= 8'b00110000;
+						3'd6: dot_matrix_left_col <= 8'b01100000;
+						3'd7: dot_matrix_left_col <= 8'b01100000;
+					endcase
+				end
+			endcase
+			
+			case(p2_score)
+				3'd0: begin
+					//left matrix
+					case(row_count)
+						3'd0: dot_matrix_left_col <= 8'b00000000;
+						3'd1: dot_matrix_left_col <= 8'b00111100;
+						3'd2: dot_matrix_left_col <= 8'b01100110;
+						3'd3: dot_matrix_left_col <= 8'b11000011;
+						3'd4: dot_matrix_left_col <= 8'b11000011;
+						3'd5: dot_matrix_left_col <= 8'b01100110;
+						3'd6: dot_matrix_left_col <= 8'b00111100;
+						3'd7: dot_matrix_left_col <= 8'b00000000;
+					endcase
+				end
+				3'd1: begin
+					//left matrix
+					case(row_count)
+						3'd0: dot_matrix_left_col <= 8'b00000000;
+						3'd1: dot_matrix_left_col <= 8'b00011000;
+						3'd2: dot_matrix_left_col <= 8'b00111000;
+						3'd3: dot_matrix_left_col <= 8'b00011000;
+						3'd4: dot_matrix_left_col <= 8'b00011000;
+						3'd5: dot_matrix_left_col <= 8'b00011000;
+						3'd6: dot_matrix_left_col <= 8'b01111100;
+						3'd7: dot_matrix_left_col <= 8'b00000000;
+					endcase
+				end
+				3'd2: begin
+					//left matrix
+					case(row_count)
+						3'd0: dot_matrix_left_col <= 8'b00000000;
+						3'd1: dot_matrix_left_col <= 8'b00111100;
+						3'd2: dot_matrix_left_col <= 8'b01100110;
+						3'd3: dot_matrix_left_col <= 8'b00001100;
+						3'd4: dot_matrix_left_col <= 8'b00011000;
+						3'd5: dot_matrix_left_col <= 8'b00110000;
+						3'd6: dot_matrix_left_col <= 8'b01111110;
+						3'd7: dot_matrix_left_col <= 8'b00000000;
+					endcase
+				end
+				3'd3: begin
+					//left matrix
+					case(row_count)
+						3'd0: dot_matrix_left_col <= 8'b00000000;
+						3'd1: dot_matrix_left_col <= 8'b00111100;
+						3'd2: dot_matrix_left_col <= 8'b00000110;
+						3'd3: dot_matrix_left_col <= 8'b00000110;
+						3'd4: dot_matrix_left_col <= 8'b00111100;
+						3'd5: dot_matrix_left_col <= 8'b00000110;
+						3'd6: dot_matrix_left_col <= 8'b00000110;
+						3'd7: dot_matrix_left_col <= 8'b00111100;
+					endcase
+				end
+				3'd4: begin
+						//left matrix
+					case(row_count)
+						3'd0: dot_matrix_left_col <= 8'b00000000;
+						3'd1: dot_matrix_left_col <= 8'b00001110;
+						3'd2: dot_matrix_left_col <= 8'b00010110;
+						3'd3: dot_matrix_left_col <= 8'b00100110;
+						3'd4: dot_matrix_left_col <= 8'b01000110;
+						3'd5: dot_matrix_left_col <= 8'b11111110;
+						3'd6: dot_matrix_left_col <= 8'b00000110;
+						3'd7: dot_matrix_left_col <= 8'b00000110;
+					endcase
+				end
+				3'd5: begin
+					//left matrix
+					case(row_count)
+						3'd0: dot_matrix_left_col <= 8'b00000000;
+						3'd1: dot_matrix_left_col <= 8'b00111110;
+						3'd2: dot_matrix_left_col <= 8'b00100000;
+						3'd3: dot_matrix_left_col <= 8'b00100000;
+						3'd4: dot_matrix_left_col <= 8'b00111110;
+						3'd5: dot_matrix_left_col <= 8'b00000010;
+						3'd6: dot_matrix_left_col <= 8'b00000010;
+						3'd7: dot_matrix_left_col <= 8'b00111110;
+					endcase
+				end
+				3'd6: begin
+					//left matrix
+					case(row_count)
+						3'd0: dot_matrix_left_col <= 8'b00000000;
+						3'd1: dot_matrix_left_col <= 8'b01111100;
+						3'd2: dot_matrix_left_col <= 8'b01100000;
+						3'd3: dot_matrix_left_col <= 8'b01100000;
+						3'd4: dot_matrix_left_col <= 8'b01111110;
+						3'd5: dot_matrix_left_col <= 8'b01100010;
+						3'd6: dot_matrix_left_col <= 8'b01100010;
+						3'd7: dot_matrix_left_col <= 8'b01111110;
+					endcase
+				end
+				3'd7: begin
+					//left matrix
+					case(row_count)
+						3'd0: dot_matrix_left_col <= 8'b00000000;
+						3'd1: dot_matrix_left_col <= 8'b01111110;
+						3'd2: dot_matrix_left_col <= 8'b00000110;
+						3'd3: dot_matrix_left_col <= 8'b00001100;
+						3'd4: dot_matrix_left_col <= 8'b00011000;
+						3'd5: dot_matrix_left_col <= 8'b00110000;
+						3'd6: dot_matrix_left_col <= 8'b01100000;
+						3'd7: dot_matrix_left_col <= 8'b01100000;
+					endcase
+				end
+			endcase
+		end
+		
+		
+		
+		//row matrix
+		case(row_count)
+			3'd0: dot_matrix_row <= 8'b01111111;
+			3'd1: dot_matrix_row <= 8'b10111111;
+			3'd2: dot_matrix_row <= 8'b11011111;
+			3'd3: dot_matrix_row <= 8'b11101111;
+			3'd4: dot_matrix_row <= 8'b11110111;
+			3'd5: dot_matrix_row <= 8'b11111011;
+			3'd6: dot_matrix_row <= 8'b11111101;
+			3'd7: dot_matrix_row <= 8'b11111110;
+		endcase
+			
+		row_count <= row_count + 1;
+	end
+endmodule 
