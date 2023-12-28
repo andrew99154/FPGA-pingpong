@@ -141,9 +141,9 @@ module board_controller(
 	  input [9:0] down_limit
 	);
 		begin
-			if (up && !down && current_position >= up_limit + move_speed)
+			if (!up && down && current_position >= up_limit + move_speed)
 				calculate_next_position = current_position - move_speed;
-			else if (!up && down && current_position <= down_limit - move_speed)
+			else if (up && !down && current_position <= down_limit - move_speed)
 				calculate_next_position = current_position + move_speed;
 			else
 				calculate_next_position = current_position;
@@ -188,10 +188,10 @@ module ball_next_state(
 		end else begin
 			case(game_state)
 				p1_serve: begin
-					if (p1u) begin
+					if (!p1u) begin
 						speed_next_x = SPEED_X;
 						speed_next_y = -SPEED_Y;
-					end else if (p1d) begin
+					end else if (!p1d) begin
 						speed_next_x = SPEED_X;
 						speed_next_y = SPEED_Y;
 					end else begin
@@ -201,10 +201,10 @@ module ball_next_state(
 				end
 				
 				p2_serve: begin
-					if (p2u) begin
+					if (!p2u) begin
 						speed_next_x = -SPEED_X;
 						speed_next_y = -SPEED_Y;
-					end else if (p2d) begin
+					end else if (!p2d) begin
 						speed_next_x = -SPEED_X;
 						speed_next_y = SPEED_Y;
 					end else begin
@@ -214,8 +214,8 @@ module ball_next_state(
 				end
 				playing: begin
 					//check whether the ball is hitting the board (horizontal)
-					if ((ball_x >= LEFT_BOUND && ball_x + speed_curr_x < LEFT_BOUND && ball_y + speed_curr_y >= p1_y && ball_y + speed_curr_y + BALL_WIDTH <= p1_y + BOARD_HEIGHT)
-						|| (ball_x + BALL_WIDTH <= RIGHT_BOUND && ball_x + speed_curr_x + BALL_WIDTH > RIGHT_BOUND && ball_y + speed_curr_y >= p2_y && ball_y + speed_curr_y + BALL_WIDTH <= p2_y + BOARD_HEIGHT)) 
+					if ((ball_x >= LEFT_BOUND && ball_x + speed_curr_x < LEFT_BOUND && ball_y + speed_curr_y + BALL_WIDTH > p1_y && ball_y + speed_curr_y < p1_y + BOARD_HEIGHT)
+						|| (ball_x + BALL_WIDTH <= RIGHT_BOUND && ball_x + speed_curr_x + BALL_WIDTH > RIGHT_BOUND && ball_y + speed_curr_y + BALL_WIDTH > p2_y && ball_y + speed_curr_y < p2_y + BOARD_HEIGHT)) 
 						speed_next_x = -speed_curr_x;
 					else speed_next_x = speed_curr_x;
 
@@ -294,7 +294,7 @@ module process_next_state(clk,reset,p1u,p1d,p2u,p2d,ball_x,ball_y,time_cnt,game_
 	output reg [3:0] p1_score;
 	output reg [3:0] p2_score;
 	
-	wire p1u_deb, p1d_deb, p2u_deb, p2d_deb;
+//	wire p1u_deb, p1d_deb, p2u_deb, p2d_deb;
 	
 	parameter p1_serve = 2'd0;
 	parameter p2_serve = 2'd1;
@@ -305,10 +305,10 @@ module process_next_state(clk,reset,p1u,p1d,p2u,p2d,ball_x,ball_y,time_cnt,game_
 	parameter p1_board_x= 10'd110;
 	parameter p2_board_x= 10'd530;
 	
-	debouncer p1u_debouncer(clk, p1u, p1u_deb);
-	debouncer p1d_debouncer(clk, p1d, p1d_deb);
-	debouncer p2u_debouncer(clk, p2u, p2u_deb);
-	debouncer p2d_debouncer(clk, p2d, p2d_deb);
+//	debouncer p1u_debouncer(clk, p1u, p1u_deb);
+//	debouncer p1d_debouncer(clk, p1d, p1d_deb);
+//	debouncer p2u_debouncer(clk, p2u, p2u_deb);
+//	debouncer p2d_debouncer(clk, p2d, p2d_deb);
 
 	
 	always @(posedge clk or negedge reset)
@@ -324,16 +324,16 @@ module process_next_state(clk,reset,p1u,p1d,p2u,p2d,ball_x,ball_y,time_cnt,game_
 			else begin
 				case(game_state)
 					p1_serve: begin
-						if(!p1u_deb && !p1d_deb) //p1 start the ball
-							game_state <= p1_serve;
-						else //keep p1_sreve
+						if(!p1u || !p1d) //p1 start the ball
 							game_state <= playing;
+						else //keep p1_sreve
+							game_state <= p1_serve;
 					end
 					p2_serve: begin
-						if(!p2u_deb && !p2d_deb) //p2 start the ball
-							game_state <= p2_serve;
-						else //keep_p2_serve
+						if(!p2u || !p2d) //p2 start the ball
 							game_state <= playing;
+						else //keep_p2_serve
+							game_state <= p2_serve;
 					end
 					playing: begin
 						if(ball_x>p2_board_x)//p1 goal ,from playing to p2_serve
