@@ -17,8 +17,8 @@ module process_next_state(reset,p1l,p1r,p2l,p2r,ball_x,ball_y,time_cnt,game_stat
 	parameter game_end =2'd3;
 	parameter goal_points =3'd7;
 	parameter game_times = 6'd60;
-	parameter p1_board_x= 10'd150;
-	parameter p2_board_x= 10'd490;
+	parameter p1_board_x= 10'd110;
+	parameter p2_board_x= 10'd530;
 	
 always @(posedge clk or negedge reset)
 begin
@@ -64,7 +64,7 @@ begin
 				game_state=p1_serve;
 				p2_score=p2_score+1'd1;
 			end
-			else if(time_cnt>=game_times)//times out
+			else if(time_cnt<=6'd0)//times out
 				game_state=game_end;
 			else//keep playing
 				game_state=playing;
