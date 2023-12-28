@@ -430,7 +430,7 @@ module vga_displayer(clk, reset, p1_y, p2_y, ball_x, ball_y, hsync, vsync, red, 
 			  end
 			  else if(pixel_x >= ball_x && pixel_x < ball_x + BALL_WIDTH && pixel_y >= ball_y && pixel_y < ball_y + BALL_WIDTH) begin
 					red <= 4'hF; 
-					green <= 4'hF; //ball is green 
+					green <= 4'hF; //ball is yellow 
 					blue <= 4'h0; 
 			  end
 			  else if(pixel_x >= BORDER_TOP_X && pixel_x < BORDER_TOP_X+BORDER_LONG && pixel_y >= BORDER_TOP_Y && pixel_y < BORDER_TOP_Y+BORDER_WEIGHT)begin
