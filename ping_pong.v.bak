@@ -119,7 +119,6 @@ module board_controller(
 					p1_y <= center;
 					p2_y <= center;
 				end
-				default: //nothing
 			endcase
 		end
 	end
@@ -332,7 +331,6 @@ module timer(
 	always@(posedge clk or negedge reset) begin
 		if(!reset) begin
 			time_cnt <= 6'd60;
-			count <= 33'd0;
 		end else begin
 			case(game_state)
 				2'd0: begin
@@ -343,14 +341,13 @@ module timer(
 					end
 				2'd2: begin
 						//playing
-						count <= count + 1;
+						count <= count - 1;
 					end
 				2'd3: begin
 						//done
 						count <= 0;
 						time_cnt <= 6'd60;
 					end
-				default: //nothing
 			endcase
 			
 			if(count >= 25000000) begin
@@ -378,29 +375,27 @@ module time_displayer(
 		case(one)
 			4'd0: time_one <= 7'b1000000;
 			4'd1: time_one <= 7'b1111001;
-			4'd2: time_one <= 7'b0010010;
-			4'd3: time_one <= 7'b0110000;
+			4'd2: time_one <= 7'b0100100;
+			4'd3: time_one <= 7'b0011000;
 			4'd4: time_one <= 7'b0011001;
 			4'd5: time_one <= 7'b0001010;		
 			4'd6: time_one <= 7'b0000010;
 			4'd7: time_one <= 7'b1111000;
 			4'd8: time_one <= 7'b0000000;
 			4'd9: time_one <= 7'b0010000;
-			default: //nothing
 		endcase
 	
 		case(ten)
 			4'd0: time_ten <= 7'b1000000;
 			4'd1: time_ten <= 7'b1111001;
-			4'd2: time_ten <= 7'b0010010;
-			4'd3: time_ten <= 7'b0110000;
+			4'd2: time_ten <= 7'b0100100;
+			4'd3: time_ten <= 7'b0011000;
 			4'd4: time_ten <= 7'b0011001;
 			4'd5: time_ten <= 7'b0001010;		
 			4'd6: time_ten <= 7'b0000010;
 			4'd7: time_ten <= 7'b1111000;
 			4'd8: time_ten <= 7'b0000000;
 			4'd9: time_ten <= 7'b0010000;
-			default: //nothing
 		endcase
 	end
 
@@ -426,9 +421,6 @@ module matrix_displayer(
 	always@(posedge clk) begin
 		if(!reset) begin
 			row_count <= 0;	//init
-			dot_matrix_row <= 8'b0;
-			dot_matrix_left_col <= 8'b0;
-			dot_matrix_right_col <= 8'b0;
 		end else begin
 			if(game_state == done) begin
 				//show who's the winner
@@ -444,7 +436,6 @@ module matrix_displayer(
 						3'd5: dot_matrix_left_col <= 8'b01100000;
 						3'd6: dot_matrix_left_col <= 8'b01100000;
 						3'd7: dot_matrix_left_col <= 8'b01100000;
-						default: //nothing
 					endcase
 					
 					//right matrix
@@ -457,7 +448,6 @@ module matrix_displayer(
 						3'd5: dot_matrix_right_col <= 8'b00011000;
 						3'd6: dot_matrix_right_col <= 8'b01111100;
 						3'd7: dot_matrix_right_col <= 8'b00000000;
-						default: //nothing
 					endcase
 				end else if(p2_score > p1_score) begin
 					//P2
@@ -471,7 +461,6 @@ module matrix_displayer(
 						3'd5: dot_matrix_left_col <= 8'b01100000;
 						3'd6: dot_matrix_left_col <= 8'b01100000;
 						3'd7: dot_matrix_left_col <= 8'b01100000;
-						default: //nothing
 					endcase
 					
 					//right matrix
@@ -484,7 +473,6 @@ module matrix_displayer(
 						3'd5: dot_matrix_right_col <= 8'b00110000;
 						3'd6: dot_matrix_right_col <= 8'b01111110;
 						3'd7: dot_matrix_right_col <= 8'b00000000;
-						default: //nothing
 					endcase
 				end else begin
 					//same score
@@ -498,7 +486,6 @@ module matrix_displayer(
 						3'd5: dot_matrix_left_col <= 8'b01100000;
 						3'd6: dot_matrix_left_col <= 8'b01100000;
 						3'd7: dot_matrix_left_col <= 8'b01100000;
-						default: //nothing
 					endcase
 					
 					//right matrix
@@ -511,7 +498,6 @@ module matrix_displayer(
 						3'd5: dot_matrix_right_col <= 8'b01100000;
 						3'd6: dot_matrix_right_col <= 8'b01100000;
 						3'd7: dot_matrix_right_col <= 8'b01100000;
-						default: //nothing
 					endcase
 				
 				end
@@ -529,7 +515,6 @@ module matrix_displayer(
 							3'd5: dot_matrix_left_col <= 8'b01100110;
 							3'd6: dot_matrix_left_col <= 8'b00111100;
 							3'd7: dot_matrix_left_col <= 8'b00000000;
-						default: //nothing
 						endcase
 					end
 					3'd1: begin
@@ -569,7 +554,6 @@ module matrix_displayer(
 							3'd5: dot_matrix_left_col <= 8'b00000110;
 							3'd6: dot_matrix_left_col <= 8'b00000110;
 							3'd7: dot_matrix_left_col <= 8'b00111100;
-						default: //nothing
 						endcase
 					end
 					3'd4: begin
@@ -638,7 +622,6 @@ module matrix_displayer(
 							3'd5: dot_matrix_left_col <= 8'b01100110;
 							3'd6: dot_matrix_left_col <= 8'b00111100;
 							3'd7: dot_matrix_left_col <= 8'b00000000;
-						default: //nothing
 						endcase
 					end
 					3'd1: begin
@@ -678,7 +661,6 @@ module matrix_displayer(
 							3'd5: dot_matrix_left_col <= 8'b00000110;
 							3'd6: dot_matrix_left_col <= 8'b00000110;
 							3'd7: dot_matrix_left_col <= 8'b00111100;
-						default: //nothing
 						endcase
 					end
 					3'd4: begin
@@ -692,7 +674,6 @@ module matrix_displayer(
 							3'd5: dot_matrix_left_col <= 8'b11111110;
 							3'd6: dot_matrix_left_col <= 8'b00000110;
 							3'd7: dot_matrix_left_col <= 8'b00000110;
-						default: //nothing
 						endcase
 					end
 					3'd5: begin
@@ -706,7 +687,6 @@ module matrix_displayer(
 							3'd5: dot_matrix_left_col <= 8'b00000010;
 							3'd6: dot_matrix_left_col <= 8'b00000010;
 							3'd7: dot_matrix_left_col <= 8'b00111110;
-						default: //nothing
 						endcase
 					end
 					3'd6: begin
@@ -720,7 +700,6 @@ module matrix_displayer(
 							3'd5: dot_matrix_left_col <= 8'b01100010;
 							3'd6: dot_matrix_left_col <= 8'b01100010;
 							3'd7: dot_matrix_left_col <= 8'b01111110;
-						default: //nothing
 						endcase
 					end
 					3'd7: begin
@@ -734,7 +713,6 @@ module matrix_displayer(
 							3'd5: dot_matrix_left_col <= 8'b00110000;
 							3'd6: dot_matrix_left_col <= 8'b01100000;
 							3'd7: dot_matrix_left_col <= 8'b01100000;
-						default: //nothing
 						endcase
 					end
 				endcase
@@ -754,7 +732,6 @@ module matrix_displayer(
 				3'd5: dot_matrix_row <= 8'b11111011;
 				3'd6: dot_matrix_row <= 8'b11111101;
 				3'd7: dot_matrix_row <= 8'b11111110;
-						default: //nothing
 			endcase
 				
 			row_count <= row_count + 1;
